@@ -18,7 +18,7 @@ import "fmt"
 //     12: []int{7},
 // }
 
-var nodes = map[int][]int{
+var testNodes = map[int][]int{
 	0: []int{1, 2},
 	1: []int{2},
 	2: []int{0, 3},
@@ -27,7 +27,7 @@ var nodes = map[int][]int{
 
 func main() {
 	visited := []int{}
-	bfs(2, nodes, func(node int) {
+	bfs(2, testNodes, func(node int) {
 		visited = append(visited, node)
 	})
 	fmt.Println(visited)
