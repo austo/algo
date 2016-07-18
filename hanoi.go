@@ -54,11 +54,8 @@ func moveDisksNR(n int, from, to, buffer *Stack) error {
 	var err error
 	// for i := 1; i <= totalMoves; i++ {
 	i := 1
-	for {
+	for len(*to) < n {
 		if err != nil {
-			break
-		}
-		if len(*to) == n {
 			break
 		}
 		switch i % 3 {
