@@ -14,12 +14,12 @@ func main() {
 }
 
 func cancelSums(head *node) *node {
-	m := make(map[int]struct{})
+	m := make(map[int]int)
 	pos := 0
 	neg := 0
 	for np := head; np != nil; np = np.next {
 		d := np.data
-		m[d] = struct{}{}
+		m[d]++
 		if d > 0 {
 			pos += d
 		} else if d < 0 {
