@@ -8,85 +8,94 @@ type node struct {
 }
 
 func main() {
-	l := makeList([]int{6, -6, 8, 4, -12, 9, 8, -8})
-	r := cancelSums2(l)
-	// printList(r)
-	printNodes(r)
+	for _, v := range [][]int{
+		[]int{6, -6, 8, 4, -12, 9, 8, -8},
+		[]int{4, 6, -10, 8, 9, 10, -19, 10, -18, 20, 25},
+		[]int{4, 6, -10, 8, 9, 10, -19, 10, -18, 20, 25, -7, -13},
+		[]int{4, 6, -10, 8, 9, 10, -19, 10, -18, 20, 25, -7, -13, 1},
+	} {
+		l := makeList(v)
+		// printList(cancelSums2(l))
+		fmt.Println(cancelSums(l))
+	}
 }
 
-func cancelSums2(head *node) []*node {
-	// walk the list and tally the elements
-	// when the elements add to zero, reset the head of the list to the next element
+func cancelSums(head *node) []int {
+	// 1. walk the list and elements to map
+	// 2. decrement negative map entry if found
+	// 3. when the elements add to zero,
+	// 		clear the map to handle mutiple summands
 	sum := 0
-	nodes := []*node{}
+	m := map[int]int{}
 	for np := head; np != nil; np = np.next {
 		sum += np.data
-		nodes = append(nodes, np)
 		if sum == 0 {
-			nodes = []*node{}
-		}
-	}
-	return nodes
-}
-
-func cancelSums(head *node) *node {
-	m := make(map[int]int)
-	pos := 0
-	neg := 0
-	for np := head; np != nil; np = np.next {
-		d := np.data
-		m[d]++
-		if d > 0 {
-			pos += d
-		} else if d < 0 {
-			neg += d
-		}
-	}
-	if pos == neg {
-		return nil
-	}
-	return &node{data: pos + neg}
-}
-
-// func find(arr []int, sum int) []int {
-// 	currSum := arr[0]
-// 	for
-
-// }
-
-func find(k, m map[int]int) (bool, []int) {
-	if v, ok := m[k]; !ok {
-		return false, nil
-	} else {
-		return true, []int{k}
-	}
-	// get smallest number < k
-	var j int
-	if k < 0 {
-		j = -1
-	} else {
-		j = 1
-	}
-	rest := []int{}
-	for j != k {
-		if v, ok := m[j]; !ok {
-			if j < 0 {
-				j--
+			m = map[int]int{}
+		} else {
+			if _, ok := m[-np.data]; !ok {
+				m[np.data]++
 			} else {
-				j++
+				delete(m, -np.data)
 			}
 		}
 	}
-	if k < 0 {
-		for j := -1; j > k; j-- {
-			if 
-		}
-	} else {
-		for j := 1; j < k; j++ {
 
+	// TODO: some recursive thing to get rid of the remaining sums
+	if v, ok := m[sum]; ok {
+		m = map[int]int{
+			sum: v,
 		}
 	}
 
+	nodes := []int{}
+	for k, v := range m {
+		for i := 0; i < v; i++ {
+			nodes = append(nodes, k)
+		}
+	}
+	for i := 0; i < len(nodes); i++ {
+		s := sum - nodes[i]
+		if v, ok := m[s]; ok {
+			m = map[int]int{
+				s:        v,
+				nodes[i]: m[nodes[i]],
+			}
+		}
+	}
+	nodes = []int{}
+	for k, v := range m {
+		for i := 0; i < v; i++ {
+			nodes = append(nodes, k)
+		}
+	}
+
+	return nodes
+}
+
+func cancelSums2(head *node) *node {
+	stack := []int{}
+	m := map[int]*node{}
+	sum := 0
+	np := head
+	for np != nil {
+		sum += np.data
+		if _, ok := m[sum]; ok {
+			for stack[len(stack)-1] != sum {
+				top := stack[len(stack)-1]
+				delete(m, top)
+			}
+			m[sum].next = np
+		} else if sum == 0 {
+			head = np.next
+			m = map[int]*node{}
+			stack = []int{}
+		} else {
+			stack = append(stack, sum)
+			m[sum] = np
+		}
+		np = np.next
+	}
+	return head
 }
 
 func makeList(ints []int) *node {
@@ -112,16 +121,6 @@ func printList(head *node) {
 		}
 		fmt.Print(np.data)
 		i++
-	}
-	fmt.Println()
-}
-
-func printNodes(nodes []*node) {
-	for i, v := range nodes {
-		if i > 0 {
-			fmt.Print(", ")
-		}
-		fmt.Print(v.data)
 	}
 	fmt.Println()
 }
