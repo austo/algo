@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"container/heap"
 	"errors"
 	"fmt"
 	"io"
@@ -49,10 +50,14 @@ func main() {
 }
 
 func dijkstra(g map[int][]edge, start int) {
-	dist := make([]int, len(g)+1)
-	h := newHeap(len(g) + 1)
+	n := len(g) + 1
+	dist := make([]int, n)
+	h := minHeap{
+		heap: make([]heapNode, n),
+		pos:  make([]int, n),
+	}
 
-	for i := 0; i <= len(g); i++ {
+	for i := 0; i < n; i++ {
 		dist[i] = MAX
 		h.heap[i] = heapNode{i, MAX}
 		h.pos[i] = i
@@ -61,8 +66,8 @@ func dijkstra(g map[int][]edge, start int) {
 	dist[start] = 0
 	h.Update(start, 0)
 
-	for len(h.heap) > 0 {
-		hn := h.Pop()
+	for h.Len() > 0 {
+		hn := heap.Pop(&h).(heapNode)
 		u := hn.v
 
 		for _, edge := range g[u] {
@@ -121,82 +126,36 @@ type heapNode struct {
 	dist int
 }
 
-type heap struct {
+type minHeap struct {
 	heap []heapNode
 	pos  []int
 }
 
-func newHeap(n int) heap {
-	h := heap{
-		heap: make([]heapNode, n),
-		pos:  make([]int, n),
-	}
-	return h
-}
-
-func (h heap) Init() {
-	n := len(h.heap)
-	for i := n/2 - 1; i >= 0; i-- {
-		down(h, i, n)
-	}
-}
-
-func (h *heap) Push(v heapNode) {
-	h.heap = append(h.heap, v)
-	up(*h, len(h.heap)-1)
-}
-
-func (h *heap) Pop() heapNode {
-	n := len(h.heap) - 1
-	h.Swap(0, n)
-	down(*h, 0, n)
-	x := h.heap[n]
-	h.heap = h.heap[0:n]
-	return x
-}
-
-func (h heap) Update(v, dist int) {
-	index := h.pos[v]
-	h.heap[index].dist = dist
-	down(h, index, len(h.heap))
-	up(h, index)
-}
-
-func (h heap) Has(v int) bool {
-	return h.pos[v] < len(h.heap)
-}
-
-func (h heap) Swap(i, j int) {
+func (h minHeap) Len() int           { return len(h.heap) }
+func (h minHeap) Less(i, j int) bool { return h.heap[i].dist < h.heap[j].dist }
+func (h minHeap) Swap(i, j int) {
 	h.heap[i], h.heap[j] = h.heap[j], h.heap[i]
 	h.pos[h.heap[i].v] = i
 	h.pos[h.heap[j].v] = j
 }
 
-func up(h heap, j int) {
-	for {
-		i := (j - 1) / 2 // parent
-		if i == j || h.heap[j].dist >= h.heap[i].dist {
-			break
-		}
-		h.Swap(i, j)
-		j = i
-	}
+func (h *minHeap) Push(x interface{}) {
+	h.heap = append(h.heap, x.(heapNode))
 }
 
-func down(h heap, i, n int) {
-	for {
-		j1 := 2*i + 1
-		if j1 >= n || j1 < 0 { // j1 < 0 after int overflow
-			break
-		}
-		j := j1 // left child
-		if j2 := j1 + 1; j2 < n && h.heap[j1].dist >= h.heap[j2].dist {
-			j = j2 // = 2*i + 2  // right child
-		}
-		if h.heap[j].dist >= h.heap[i].dist {
-			break
-		}
-		h.Swap(i, j)
-		i = j
-	}
+func (h *minHeap) Pop() interface{} {
+	n := h.Len() - 1
+	x := h.heap[n]
+	h.heap = h.heap[0:n]
+	return x
+}
+
+func (h *minHeap) Update(v, dist int) {
+	index := h.pos[v]
+	h.heap[index].dist = dist
+	heap.Fix(h, index)
+}
+
+func (h minHeap) Has(v int) bool {
+	return h.pos[v] < h.Len()
 }

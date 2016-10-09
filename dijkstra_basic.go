@@ -11,7 +11,6 @@ import (
 	"strings"
 )
 
-// var re = regexp.MustCompile(`(^\d+)(?:\s+?(\d+,\d+))*`)
 var re = regexp.MustCompile(`\s+`)
 
 const MAX = 1000000
@@ -46,14 +45,6 @@ func main() {
 			break
 		}
 	}
-	// for k := range graph {
-	// 	fmt.Println(k)
-	// }
-	// fmt.Println(len(graph))
-	// for i := 1; i <= 200; i++ {
-	// 	fmt.Println(i, graph[i])
-	// 	fmt.Println()
-	// }
 	dijkstra(g, 1)
 }
 
