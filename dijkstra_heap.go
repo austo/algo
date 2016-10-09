@@ -65,8 +65,12 @@ func dijkstra(g map[int][]edge, start int) {
 		hn := h.Pop()
 		u := hn.v
 
+		if dist[u] == MAX {
+			continue
+		}
+
 		for _, edge := range g[u] {
-			if !h.Has(edge.v) || dist[u] == MAX {
+			if !h.Has(edge.v) {
 				continue
 			}
 			if dist[u]+edge.w < dist[edge.v] {
