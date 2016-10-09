@@ -1,0 +1,16 @@
+Need to practice:
+
+1. Find the common sequences of purchases in a dataset containing information in the following form:
+	type record struct {
+		userId string
+		itemId string
+		timestamp time.Time
+	}
+
+	first, sort dataset by user, then by item, then (somehow) find all the item sequences in the sorted dataset
+		Suffix tree?
+		Hashmap
+
+
+2. Solid understanding of directed and undirect graph cycle detection
+	topological sort
