@@ -12,5 +12,14 @@ Need to practice:
 		Hashmap
 
 
-2. Solid understanding of directed and undirect graph cycle detection
-	topological sort
+2. Solid understanding of directed and undirected graph cycle detection
+	Topological sort - does the straightforward algo apply to undirected graphs?
+	Let's compute cycles in cname records
+
+
+3. HashMap implementation using only arrays
+
+4. Dynamic programming and optimization problems
+	Knapsack anyone?
+	Longest common subsequence
+	Know how to recognize these types of problems and how to quickly implement a solution
