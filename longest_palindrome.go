@@ -101,6 +101,39 @@ func longestPalFixed(s string) string {
 	return s[start : start+max]
 }
 
+func longestPalMap(s string) string {
+	n := len(s)
+	cache := make(map[string]bool, n*n)
+
+	const keyFmt = "%d-%d"
+
+	max := 1
+	start := 0
+
+	for i := 0; i < n; i++ {
+		cache[fmt.Sprintf(keyFmt, i, i)] = true
+		if i < n-1 && s[i] == s[i+1] {
+			cache[fmt.Sprintf(keyFmt, i, i+1)] = true
+			max = 2
+			start = i
+		}
+	}
+
+	offset := 2
+
+	for offset < n {
+		for i := 0; i < n-offset; i++ {
+			if cache[fmt.Sprintf(keyFmt, i+1, i+offset-1)] && s[i] == s[i+offset] {
+				cache[fmt.Sprintf(keyFmt, i, i+offset)] = true
+				max = offset + 1
+				start = i
+			}
+		}
+		offset++
+	}
+	return s[start : start+max]
+}
+
 func timeIt(desc string, f func()) {
 	start := time.Now()
 	for i := 0; i < 1000; i++ {
@@ -123,5 +156,9 @@ func main() {
 
 	timeIt("constant array", func() {
 		longestPalFixed(str)
+	})
+
+	timeIt("map (string key)", func() {
+		longestPalMap(str) // wow, it's sooo much slower!
 	})
 }
