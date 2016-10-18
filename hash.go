@@ -26,6 +26,12 @@ func main() {
 
 	fmt.Printf("size = %d\n", h.size)
 
+	h.ForEach(func(k string, v interface{}) {
+		fmt.Printf("(ForEach) %s => %d\n", k, v)
+	})
+
+	fmt.Println(h.Keys())
+
 	fmt.Printf("%#v\n", h)
 
 }
@@ -87,6 +93,23 @@ func (h *hashMap) Get(k string) interface{} {
 	return nil
 }
 
+func (h *hashMap) ForEach(fn func(k string, v interface{})) {
+	for i := 0; i < len(h.buckets); i++ {
+		for j := 0; j < len(h.buckets[i]); j++ {
+			v := h.buckets[i][j]
+			fn(v.key, v.value)
+		}
+	}
+}
+
+func (h *hashMap) Keys() []string {
+	keys := make([]string, 0, h.size)
+	h.ForEach(func(k string, v interface{}) {
+		keys = append(keys, k)
+	})
+	return keys
+}
+
 func (h *hashMap) resize() {
 	fmt.Println("resizing...")
 	oldNBuckets := h.nBuckets
@@ -119,6 +142,9 @@ func hash(s string) int {
 	result := 0
 	for i := 0; i < len(s); i++ {
 		result = 31*result + int(s[i])
+	}
+	if result < 0 { // int overflow
+		return -result
 	}
 	return result
 }
